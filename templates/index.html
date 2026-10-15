@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="panel">
+  <h1>Watch a page</h1>
+  <form method="post" action="/add">
+    <div class="grid">
+      <div><label for="url">Page URL</label><input id="url" name="url" placeholder="https://example.com/product" required></div>
+      <div><label for="name">Name</label><input id="name" name="name" placeholder="Product price"></div>
+      <div><label for="iv">Check every</label><select id="iv" name="interval_min">
+        {% for v, t in intervals %}<option value="{{v}}" {% if v==60 %}selected{% endif %}>{{t}}</option>{% endfor %}</select></div>
+      <div><label for="sens">Sensitivity</label><select id="sens" name="sensitivity">
+        {% for s in sens %}<option {% if s=='medium' %}selected{% endif %}>{{s}}</option>{% endfor %}</select></div>
+      <div><label for="kw">Only alert on keywords (optional, comma separated)</label><input id="kw" name="keywords" placeholder="price, out of stock"></div>
+      <div><label for="em">Email alerts to</label><input id="em" name="email" type="email" placeholder="you@example.com"></div>
+      <div><label for="wh">Telegram or Discord webhook</label><input id="wh" name="webhook" placeholder="https://discord.com/api/webhooks/..."></div>
+      <div><label><input type="checkbox" name="digest" style="width:auto"> Send one daily digest instead</label></div>
+    </div>
+    <p><button>Start watching</button></p>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Watched pages</h2>
+  {% if not pages %}
+    <p class="muted">Nothing watched yet. Add a URL above — the first check runs within 15 seconds.</p>
+  {% else %}
+  <table class="list">
+    <thead><tr><th>Page</th><th>Status</th><th>Last checked</th><th>Last changed</th><th>Versions</th><th></th></tr></thead>
+    <tbody>
+    {% for p in pages %}
+      <tr class="row {{p.status}}">
+        <td><a href="/page/{{p.id}}"><strong>{{p.name}}</strong></a><div class="small muted url">{{p.url}}</div></td>
+        <td><span class="status {{p.status}}">{{p.status}}</span>{% if p.last_error %}<div class="small muted">{{p.last_error}}</div>{% endif %}</td>
+        <td>{{p.last_checked|ago}}</td>
+        <td>{{p.last_changed|ago}}</td>
+        <td>{{p.versions}}</td>
+        <td><div class="actions">
+          <form method="post" action="/page/{{p.id}}/check"><button class="ghost">Check now</button></form>
+          <a class="btn ghost" href="/compare/{{p.id}}">Compare</a></div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+<script>
+// refresh the dashboard every 30 s, but never while you're typing in the form
+setInterval(() => {
+  const typing = document.activeElement && document.activeElement.matches('input,select,textarea');
+  if (!typing && !document.getElementById('url').value) location.reload();
+}, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Change Detector{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--surface:#fff;--ink:#15233a;--muted:#5b6b82;--line:#d6dde7;--accent:#2f5bea;
+  --ok:#1f9d63;--err:#d23c3c;--blocked:#c77a00;--pending:#8a96a8;--add:#d9f5e6;--del:#fde1e1;--chg:#fff2c2}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0e1724;--surface:#152235;--ink:#e3eaf4;--muted:#93a3b8;
+  --line:#26364d;--accent:#7d9bff;--add:#15402c;--del:#4a1f22;--chg:#4a3f14}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif}
+h1,h2,h3,.brand{font-family:"Space Grotesk",system-ui,sans-serif;letter-spacing:-.01em;margin:0 0 .5em}
+h1{font-size:1.9rem}h2{font-size:1.3rem}
+a{color:var(--accent)}
+header{padding:18px 24px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{font-size:1.25rem;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:10px}
+.pulse{width:12px;height:12px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 25%,transparent)}
+main{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:24px}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:70px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+button,.btn{display:inline-block;padding:8px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;
+  font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+.ghost{background:transparent;color:var(--accent)}
+.danger{border-color:var(--err);background:transparent;color:var(--err)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.err{background:var(--del);border-left:4px solid var(--err);padding:10px 14px;border-radius:6px;margin-bottom:18px}
+.muted{color:var(--muted)}.small{font-size:.85rem}
+table.list{width:100%;border-collapse:collapse}
+table.list td,table.list th{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.list th{font-size:.85rem;color:var(--muted);font-weight:400}
+tr.row td:first-child{border-left:5px solid var(--pending)}
+tr.ok td:first-child{border-left-color:var(--ok)}tr.error td:first-child{border-left-color:var(--err)}
+tr.blocked td:first-child{border-left-color:var(--blocked)}
+.status{font-weight:700}.status.ok{color:var(--ok)}.status.error{color:var(--err)}.status.blocked{color:var(--blocked)}.status.pending{color:var(--pending)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.actions form{margin:0}
+.url{word-break:break-all}
+.timeline{list-style:none;padding:0;margin:0;border-left:2px solid var(--line)}
+.timeline li{padding:0 0 18px 18px;position:relative}
+.timeline li::before{content:"";position:absolute;left:-7px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shots img,.full img{width:100%;border:1px solid var(--line);border-radius:6px}
+.scroll{overflow:auto;max-height:600px}
+table.diff{font-size:.85rem;width:100%;border-collapse:collapse}
+table.diff td{padding:2px 6px;vertical-align:top;font-family:ui-monospace,Consolas,monospace}
+.diff_header{color:var(--muted)}.diff_next{display:none}
+.diff_add{background:var(--add)}.diff_chg{background:var(--chg)}.diff_sub{background:var(--del)}
+@media (max-width:700px){.shots{grid-template-columns:1fr}table.list thead{display:none}table.list td{display:block;border:none;padding:4px 10px}
+  tr.row{display:block;border-bottom:1px solid var(--line);padding:8px 0}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="/"><span class="pulse"></span>Change Detector</a></header>
+<main>
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+{% block body %}{% endblock %}
+</main>
+</body>
+</html>

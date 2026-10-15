@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{p.name}} · Change Detector{% endblock %}
+{% block body %}
+<section class="panel">
+  <h1>{{p.name}}</h1>
+  <p class="url"><a href="{{p.url}}" target="_blank" rel="noopener">{{p.url}}</a></p>
+  <p><span class="status {{p.status}}">{{p.status}}</span> · checked {{p.last_checked|ago}} · changed {{p.last_changed|ago}}
+    {% if p.last_error %}<br><span class="small muted">{{p.last_error}}</span>{% endif %}</p>
+  <div class="actions">
+    <form method="post" action="/page/{{p.id}}/check"><button>Check now</button></form>
+    <a class="btn ghost" href="/picker/{{p.id}}">Pick regions</a>
+    <a class="btn ghost" href="/compare/{{p.id}}">Compare versions</a>
+    <a class="btn ghost" href="/rss/{{p.id}}">RSS feed</a>
+    <form method="post" action="/page/{{p.id}}/delete" onsubmit="return confirm('Stop watching and delete all versions?')"><button class="danger">Delete</button></form>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Version timeline</h2>
+  {% if not snaps %}<p class="muted">No versions yet — the first check saves a baseline.</p>{% endif %}
+  <ul class="timeline">
+  {% for s in snaps %}
+    <li><strong>Version {{s.id}}</strong> <span class="muted small">{{s.created}} UTC</span><br>{{s.summary}}<br>
+      {% if not loop.last %}<a href="/compare/{{p.id}}?b={{s.id}}">See what changed</a> · {% endif %}
+      {% if s.screenshot %}<a href="/shot/{{s.screenshot}}" target="_blank">Screenshot</a>{% endif %}</li>
+  {% endfor %}
+  </ul>
+</section>
+
+<section class="panel">
+  <h2>Alerts</h2>
+  {% for a in alerts %}<p>{{a.created}} — {{a.summary}} <span class="small muted">{% if a.sent %}sent{% else %}waiting for digest{% endif %}</span></p>
+  {% else %}<p class="muted">No alerts yet.</p>{% endfor %}
+</section>
+
+<section class="panel">
+  <h2>Settings</h2>
+  <form method="post" action="/page/{{p.id}}/settings">
+    <div class="grid">
+      <div><label>Page URL</label><input name="url" value="{{p.url}}" required></div>
+      <div><label>Name</label><input name="name" value="{{p.name}}"></div>
+      <div><label>Check every</label><select name="interval_min">
+        {% for v, t in intervals %}<option value="{{v}}" {% if v==p.interval_min %}selected{% endif %}>{{t}}</option>{% endfor %}</select></div>
+      <div><label>Sensitivity</label><select name="sensitivity">
+        {% for s in sens %}<option {% if s==p.sensitivity %}selected{% endif %}>{{s}}</option>{% endfor %}</select></div>
+      <div><label>Only alert on keywords</label><input name="keywords" value="{{p.keywords}}"></div>
+      <div><label>Email</label><input name="email" type="email" value="{{p.email}}"></div>
+      <div><label>Telegram or Discord webhook</label><input name="webhook" value="{{p.webhook}}"></div>
+      <div><label><input type="checkbox" name="digest" style="width:auto" {% if p.digest %}checked{% endif %}> Daily digest</label></div>
+      <div><label>Watch only these regions (CSS selectors, one per line)</label><textarea name="watch_selectors">{{p.watch_selectors}}</textarea></div>
+      <div><label>Ignore these regions (CSS selectors, one per line)</label><textarea name="ignore_selectors">{{p.ignore_selectors}}</textarea></div>
+    </div>
+    <p><button>Save changes</button></p>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Compare · {{p.name}}{% endblock %}
+{% block body %}
+<p><a href="/page/{{p.id}}">Back to {{p.name}}</a></p>
+<section class="panel">
+  <h1>Compare versions</h1>
+  {% if not a %}
+    <p class="muted">You need at least two versions to compare. Versions are saved only when the content really changes.</p>
+  {% else %}
+  <form method="get" class="grid">
+    <div><label>Older version</label><select name="a">{% for s in snaps %}<option value="{{s.id}}" {% if s.id==a.id %}selected{% endif %}>Version {{s.id}} — {{s.created}}</option>{% endfor %}</select></div>
+    <div><label>Newer version</label><select name="b">{% for s in snaps %}<option value="{{s.id}}" {% if s.id==b.id %}selected{% endif %}>Version {{s.id}} — {{s.created}}</option>{% endfor %}</select></div>
+    <div style="align-self:end"><button>Compare</button></div>
+  </form>
+  {% endif %}
+</section>
+{% if a %}
+<section class="panel"><h2>Text changes</h2><div class="scroll">{{table}}</div></section>
+{% if a.screenshot and b.screenshot %}
+<section class="panel"><h2>Highlighted screenshot diff</h2><p class="muted small">Red boxes mark pixels that changed in version {{b.id}}.</p>
+  <div class="full scroll"><img src="/shotdiff/{{a.id}}/{{b.id}}.png" alt="Screenshot diff"></div></section>
+<section class="panel"><h2>Side by side</h2>
+  <div class="shots scroll"><div><p>Version {{a.id}}</p><img src="/shot/{{a.screenshot}}" alt="Version {{a.id}}"></div>
+  <div><p>Version {{b.id}}</p><img src="/shot/{{b.screenshot}}" alt="Version {{b.id}}"></div></div></section>
+{% endif %}
+{% endif %}
+{% endblock %}
